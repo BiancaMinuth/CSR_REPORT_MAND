@@ -15,7 +15,7 @@ import numpy as np
 
 
 # Your configuration
-ek.set_app_key('475cc72b4c5e490fa2f7d4d40a32ec6e904fad48')
+ek.set_app_key('xxx')
 
 ####################################################################################################
 
