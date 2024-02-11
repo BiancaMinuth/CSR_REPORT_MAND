@@ -1,0 +1,409 @@
+---
+title: | 
+ Effectiveness of Mandatory CSR Reporting: Do Firms Change their CSR Information Quality?  \vspace{0cm}
+
+date: |
+  | `r loc <- Sys.getlocale(category = "LC_TIME"); Sys.setlocale("LC_TIME", "C"); fdate <- format(Sys.time(), '%B %e, %Y'); Sys.setlocale("LC_TIME", loc); fdate` 
+  
+abstract: |
+  | In a world of climate change and increasing social incidence more and more jurisdictions are changing their regulations towards a mandatory corporate social responsibility (CSR) reporting regime. Likewise, the EU CSR regulation (‘Non-Financial Reporting Directive’ [NFRD]) was issued in 2014 with the objective to increase transparency of the social and environmental information and thus to improve the disclosure of non-financial information. We examine whether firms issue new CSR information as a reponse to the CSR mandate. Applying textual analysis, we investigate firms' disclosure quantity and quality around the implementation of the CSR regulation (‘Non-Financial Reporting Directive’ [NFRD]). Using a difference-in-difference model, we compare European firms’ CSR disclosure characteristics with a sample of U.S. control firms before and after the introduction of a CSR regulation. We expect a change of firms’ CSR disclosure length as well as the provision of new CSR information around the implementation of the NFRD. With our study, we enrich the debate on CSR reporting regime choices (*CSR disclosure*) towards a more sustainabile oriented society. 
+  |
+  
+  | \textbf{Key Words:} CSR performance; Disclosure Regulation, ESG, Real Effects 
+
+output: 
+  pdf_document:     
+    number_sections: yes
+    fig_width: 5
+    highlight: tango
+fig_caption: yes
+fontsize: 12pt
+spacing: double
+header-includes:
+  - \usepackage[nolists]{endfloat}    
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{fancyhdr}
+  - \fancyhead[CO,CE]{Your Document Header}
+  - \usepackage[utf8]{inputenc}
+  - \usepackage{booktabs} % for toprule, midrule and bottomrule
+  - \usepackage{siunitx} % for alignment of numbers in columns
+  - \usepackage{adjustbox}
+  - \usepackage{dcolumn}
+  - \usepackage{rotating, graphicx}
+ # - \setlength\parindent{24pt}\setlength{\parskip}{0.0pt plus 1.0pt}
+
+editor_options: 
+  markdown: 
+    wrap: 72
+
+---
+
+```{r setup, include=FALSE, cache=F, message=F, warning=F, results="hide"}
+knitr::opts_chunk$set(
+  cache = FALSE, echo = TRUE, message = FALSE, warning = FALSE
+)
+#library(tidyverse)
+#library(kableExtra)
+library(knitr)
+#library(tinytex)
+#library(Hmisc)
+library(stargazer)
+opts_chunk$set(out.width = '100%', dpi=300)
+opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, cache = FALSE)
+```
+
+```{r load_results, include=FALSE}
+load("../data/generated/CSR_mand_results.rda")
+```
+
+\pagebreak
+
+# Introduction
+
+To fight climate change and reach climate-neutrality by mid-century, 
+jurisdictions are increasingly implementing mandatory reporting regimes of
+sustainability disclosure standards requiring national firms to report on 
+corporate social responsibility (CSR) topics. This trend has led to vast debates 
+on the usefulness and the impact of mandatory sustainability reporting. 
+Christensen et al. (2021) get to the heart of the debate by asking for the 
+motivation of implementing mandatory sustainability reporting.  
+
+In 2014, the European Parliament issued the non-financial reporting directive [NFRD]
+“Directive 2014/95/EU” (hereafter CSR Directive), requiring large listed firms 
+in the European Union (EU) to prepare their non-financial disclosure in 
+accordance with the CSR Directive. The overall aim of this CSR disclosure mandate 
+is to increase comparability and transparency across member states through a 
+standardized format. Besides the objective to reduce information asymmetry among 
+market participants, the regulator aimed at incentivizing firms to include more 
+CSR activities in their business strategy (Lambert et al., 2007; Beyer et al., 
+2010; Christensen et al., 2021). However, if a CSR reporting mandate is the 
+answer to the intended objectives needs to be further examined. 
+
+Prior studies provide evidence that European firms change their CSR activities 
+around such a CSR mandate. Fiechter et al. (2022) show an increase in firms’ CSR 
+activities even before the effective date of CSR Directive. On the other hand, 
+Rajgopal & Tantri (2023) investigate the implementation of a CSR mandate in India 
+requiring firms to engage in CSR activities and show a decrease in CSR spending 
+after the implementation of a CSR mandate. Another related research stream 
+investigates whether firms might engage in obfuscation strategies and use 
+boilerplate language to obfuscate the readers impression of the firms’ 
+CSR activities (Christensen et al., 2019). Cho et al. (2015) argue that with 
+stronger institutional pressures firms tend to engage more in obfuscation 
+strategies with regard to CSR disclosure. Their findings suggest that firms 
+adjust their reporting language in response to both, the announcement and the 
+implementation of the EU NFRD. However, prior literature is limited to the 
+measurement of CSR disclosure quality. With our study 
+we aim to shed light on whether and to what extent firms provide new CSR information
+in response to a CSR reporting mandate.  
+
+In addition, we investigate whether 
+firms act as they talk and identify firms that exaggerate their CSR 
+performance in their CSR disclosure. This is particularly important since a 
+CSR reporting mandate – like the NFRD – is to prevent greenwashing and to avoid 
+the misuse of CSR disclosure by obfuscating actual CSR activity 
+(Bansal & Clelland, 2004; Bowen & Aragon-Correa, 2014; E.-H. Kim & Lyon, 2015). 
+Stakeholders are increasingly requiring firms to more intensively invest in 
+projects towards environmental, social, and governance (ESG) sustainability and 
+with that, reducing future risks (Pástor et al., 2021). With a standardized
+mandatory disclosure format to compare and monitor firms’ activities in ESG we 
+expect more firms to consider ESG projects in their business strategy and 
+communication.   
+
+We collect stand-alone CSR reports of selected EU firms to examine the change of 
+firms’ CSR communication. The CSR disclosure language change is measured by the 
+three quantitative components: length, new CSR information, and tone. The length 
+of the CSR report is measured by the CSR reports’ file size. We use Latent 
+Dirichlet Allocation (LDA) to exploit whether new CSR information is issues by 
+the firms. 
+CSR performance is measured by the ESG score from Thomson Reuters Refinitiv’ 
+ASSET4 database. We compute a difference-in-difference (DiD) analysis to compare 
+firms’ CSR reporting and CSR performance in scope of the ‘non-financial reporting 
+directive’ (NFRD) with a sample of U.S. control firms. To further examine the 
+action on environmental or social 
+projects, we test the change of firms’ CO2 emission and the social score by 
+Refinitiv.   
+
+With our study we contribute to the debate on CSR reporting regime choices and 
+their effects on firms’ motivation to ‘drive economic change’. First, using 
+textual analysis as a form of natural language processing we shed light on CSR 
+disclosure characteristics of European firms’ CSR disclosure adding to a growing 
+research field which opens up new opportunities to investigate qualitative 
+disclosure characteristics. Second, we contribute to the literature on CSR 
+disclosure and CSR activities to show the relationship between firms’ CSR 
+communication and CSR performance. Finally, we shed light on firms’ CSR 
+disclosure and CSR actual performance around the change in a CSR reporting 
+regime, which is particularly important to regulators, politicians, and 
+practitioners. In particular, we enhance the understanding of firms’ disclosure 
+language versus firms’ real activities to reveal accurate communication or 
+obfuscation techniques.
+
+\pagebreak
+
+# Literature review and hypotheses development
+
+*The EU non-financial reporting directive*
+
+With the aim to increase transparency and accountability on social and 
+environmental issues (Directive 2014/95, recital 2) across all EU member states, 
+the European Parliament passed the directive 2014/95/EU on April 15, 2014, with 
+effect for all fiscal years from 2017 onwards. In scope of the CSR Directive are 
+large (based on their average number of employees, balance sheet total and net 
+turnover) public interest entities in the EU. The CSR Directive mandates 
+‘in-scope’ firms to publish their non-financial disclosure, including information 
+on “the undertaking's development, performance, position and impact of its 
+activity, relating to, as a minimum, environmental, social and employee matters, 
+respect for human rights, anti-corruption and bribery matters” 
+(CSR Directive Article 1, 19a (1)) as part of their management report or in a 
+separate non-financial report (CSR Directive Article 1, 19a (1) [4]).
+
+While the regulator requires member states to implement mechanisms that ensure 
+an adequate reporting of non-financial information with regard to the CSR 
+Directive, the introduction of CSR frameworks and CSR enforcement of the 
+non-financial disclosure is to be decided on a member states level. As such, 
+member states shall ensure that the CSR disclosure is prepared by EU firms, 
+however the CSR information does not necessarily need to be verified by an 
+independent auditor (CSR Directive Article 1, 19a (1) [5-6]). Missing guidelines 
+and frameworks related to the CSR disclosure has brought vast debates about the 
+usefulness for the CSR Directive. At the same time, the CSR Directive has set a 
+new milestone towards CSR reporting. The EU CSR mandate, as an exogenous shock, 
+is an example of a rare research setting to investigate CSR reporting and real 
+effects around a CSR mandate implementation (Mittelbach-Hörmanseder et al., 2021).
+
+\vspace{0.6cm}
+\pagebreak
+
+*CSR disclosure*
+
+The NFRD was implemented with the aim to enhance transparency and comparability 
+of sustainability disclosure through a standardized format (Zhong & Gao, 2017; 
+Christensen et al., 2021). Researchers have started to examine the effect of the 
+implementation of a CSR reporting mandate. For example, Fiechter et al. (2022) 
+show that firms adjust their CSR activities as a response to the NFRD. 
+Mittelbach-Hörmanseder et al. (2021) investigate the effect of a CSR mandate on 
+firm value and find a negative relationship between share price and CSR 
+disclosure after the announcement of the NFRD. Next to the European CSR 
+directive, other jurisdictions have implemented mandatory CSR reporting regimes 
+which have been investigated. Ioannou & Serafeim (2017) provide evidence that a 
+CSR reporting mandate issued by selected countries is associated with an increase 
+in the level of CSR disclosure. Grewal et al. (2019) study the mandatory carbon 
+reporting regulation adopted in the United Kingdom in 2012 and find a decline 
+in unrepresentative carbon disclosure after the CSR regulation. Focusing on 
+climate change disclosure Kim et al. (2022) provide evidence that the SEC rule 
+regarding climate change risk (CCR) enacted in the United States incentives 
+disclosing firms to engage more in CSR activities.
+
+While prior studies are mainly focused on firms’ CSR activities change, 
+we explore qualitative attributes of CSR reports around the implementation of 
+the CSR Directive. With our study we refer to the main objective of the CSR 
+Directive to increase transparency through a standardized format. Apart from 
+the benefits a mandatory reporting regime intends to bring (for example, 
+increased market liquidity, lower cost of capital, better investment efficiency)
+it might impose further disclosure costs (cost-benefit trade-off) 
+(Leuz & Wysocki, 2016). These disclosure costs comprise actual costs such as 
+cost for the preparation and dissemination of the reports, as well as 
+consequential costs, like proprietary and litigation costs (Beyer et al., 2010; 
+Brié et al., 2022). Because of these disclosure costs, in particular proprietary 
+costs because of spill-over effects due to the publication of firm specific 
+information, firms might have incentives to not disclose their information. 
+Due to this trade-off it is not necessarily given that firms provide new 
+information after the CSR mandate. As Christensen et al. (2021) suggest, a 
+CSR mandate does not necessarily incentivize firms to provide high-quality or 
+new information. “The extent to which a CSR reporting mandate induces firms to 
+provide new and better information critically hinges on firms’ reporting 
+incentives” (Christensen et al., 2021, p. 33). With our first hypothesis
+we aim at providing evidence on the change of the information contained in 
+CSR reports after the introduction of a CSR mandate. In particular, 
+we assume a greater length of CSR reports.
+
+> *H1: Mandatory CSR reporting is associated with an increase in the length of 
+>  CSR disclosure.* 
+
+Despite all prior efforts to shed light on the effectiveness and impacts of a 
+change to a CSR reporting regime, the research on disclosure quality and 
+narrative disclosure attributes in this regard is sparce. Recent studies in 
+accounting and finance research use textual analysis or other language processing 
+tools to measure disclosure quality. Using Latent Dirichlet Allocation (LDA), 
+Sick (2022) provide evidence on the comparability of integrated versus stand-alone 
+CSR reports around the NFRD implementation. Brié et al. (2022) apply textual 
+analysis to climate-related disclosure in annual reports to show disclosure 
+quality and comparability improvements after the announcement of the NFRD. 
+We add on these studies to apply a topic modeling approach in order to identify 
+new information published in firms’ CSR reports. We test our assumption that a 
+CSR reporting mandate incentivizes firms to publish new CSR information with 
+our second hypothesis.
+
+> *H2: Mandatory CSR reporting is associated with an increase in new CSR 
+> disclosure information.* 
+
+With the introduction of a mandate for CSR reporting firms face increasing 
+pressure meeting the regulatory requirements and satisfying the needs of both – 
+shareholders and other stakeholder groups. With regard to 
+legitimate theory, a growing research stream investigates signaling strategies 
+of CSR reporting to express a firms CSR commitment. Since CSR reports are 
+published to inform shareholders and 
+stakeholders about the firms’ sustainability performance, firms are motivated to 
+create a signal, especially when the 
+sustainability performance is low (Cho et al., 2010; Hummel & Schlick, 2016; 
+Melloni et al., 2017). With a mandate increasing the importance of CSR disclosure 
+and the possibility of comparability among firms, we expect an increase in the 
+information quality of CSR reports, in particular for low performaing firms.
+
+> *H2a: The increase of new CSR disclosure information 
+> is stronger for firms with ex ante lower CSR reporting quality.* 
+
+
+\vspace{0.6cm}
+
+*CSR activity*
+
+Prior work provides evidence that a mandate of disclosure leads to a change in 
+firms’ behavior provided that the reporting format is kept simple and 
+straightforward to interpret (Bolton et al., 2021; Christensen et al., 2017; 
+Fiechter et al., 2022). First, reporting regulation provides positive information 
+spillovers to other firms, which might increase comparability of reporting 
+information (Breuer et al., 2019; Brié et al., 2022). Second, with firms’ 
+behavior having a huge impact on climate-change, stakeholders may require firms 
+to more intensively invest in sustainability oriented projects 
+(Michelon & Rodrigue, 2015; Christensen et al., 2021). Another incentive towards 
+a more sustainable business strategy is the increased risks of natural disasters 
+or social incidents that might lead to reputational damage (Pástor et al., 2021). 
+Transparency through increased reporting on CSR activities is assumed to exhibit 
+a firms’ CSR performance and, with that, the firm’s strategies on future risks 
+and opportunities. Thus, CSR reporting may be associated with an increase in CSR 
+activities. In this regard, Fiechter et al. (2022) provide evidence that firms 
+adjust their CSR activities as a response to a CSR reporting change and do so 
+even before the effective date of the mandatory reporting regime. With the next 
+hypothesis we examine CSR disclosure information of low CSR performing firms. 
+
+> *H2b: The increase of new CSR disclosure information 
+> is stronger for firms with ex ante lower CSR performance.* 
+
+\pagebreak
+
+# Research design & methodology
+
+We focus on large European firms listed in the EUROPE STOXX 600 stock index and 
+manually collected their stand-alone CSR reports through the official firm 
+website and corporate register. The treaded firms are listed EU firms that are 
+in scope of the NFRD, i.e., firm size above a certain threshold. In line with 
+Fiechter et al. (2022), we use U.S. firms listed in the S&P 500 stock index as 
+control group. Other than the EU, the US did not implement a CSR disclosure 
+mandate during our examination period (Christensen et al., 2021; Fiechter et al., 
+2022; Ioannou & Serafeim, 2017).
+
+The CSR reporting characteristics are measured as follows: The length of a 
+reports is measure by the file size. For the identification of new information 
+in the CSR reports we apply a topic modeling approach as an unsupervised machine 
+learning technique. We add ESG and firm-level data using data 
+from Thomson Reuters’ Refinitiv database ASSET4. The sample consists of 2,268 
+EU firm-year observations and 1,239 US firm-year observations (Table 1).  
+
+To address H1 to H2, we employ a difference-in-difference analysis to test 
+the change of CSR disclosure.
+
+\vspace{0.2cm}
+
+> *(1)* $CSRDisclosure_{i,t}=\beta_{0}+\beta_{1}EUState_{i,t}+
+> \beta_{2}MCSRRep_{i,t}+\beta_{3}EUState_{i,t}*MCSRRep_{i,t}+
+> Controls_{i,t}+FE_{i,t}$
+
+\vspace{0.2cm}
+where *$CSRDisclosure_{i,t}* is a measure of firms’ CSR disclosure 
+characteristics: *length* and *new information*. *$EUState_{i,t}* is a 
+dummy variable that equals 1 if the report was issued by a firm headquartered 
+in an EU member state. *$MCSRRep_{i,t}* is a dummy variable that equals 1 if 
+the firm is required to issue a mandatory CSR report (before EU NFRD) and 0 
+otherwise (after EU NFRD). The control variables include: Size as the firm size 
+calculated as the natural logarithm of total assets; Age is the natural 
+logarithm of the firm’s listing time; Lev as the ratio of total liabilities to 
+total assets; ROA is the net income divided by total assets. We further test the 
+discrepancy of CSR report and CSR activity.  
+
+To examine the impact of a CSR reporting mandate on firms’ CSR disclosure and 
+CSR performance (H2b), we add on the study by Fiechter et al. (2022). With our 
+model we compare the impact of the EU non-financial 
+reporting directive (NFRD) on selected EU firms’ CSR performance (*$CSRPerformace_{i,t}*)
+with a sample 
+of U.S. control firms.
+
+
+\vspace{0.2cm}
+> *(2)* $CSRDisclosure_{i,t}=\beta_{0}+\beta_{1}EUState_{i,t}+
+> \beta_{2}MCSRRep_{i,t}+\beta_{3}EUState_{i,t}*MCSRRep_{i,t}+CSRPerformance_{i,t}+
+> Controls_{i,t}+FE_{i,t}$
+
+\vspace{0.6cm}
+
+*Robustness Test*
+
+Fiechter et al. (2022) provide evidence that firms anticipate a change in 
+reporting regime and adjust their CSR activities even before the effective 
+date of the EU NFRD. They show that EU firms in scope of the EU NFRD on average 
+increase their CSR activities right after the announcement of the directive in 
+2014, instead of waiting until the country-specific implementation date. 
+Considering this finding by Fiechter et al. (2022), we shift our treatment event 
+from the country-specific effective date to the announcement date of the EU NFRD 
+in 2014 as part of an additional analysis.
+
+\pagebreak
+
+# Results
+
+
+
+```{r tab_1, results="asis"}
+stargazer(CSR_des, title="Descriptive Statistics", mean.sd = TRUE,  median = TRUE,
+           header = FALSE, font.size = "footnotesize", type= "latex"
+#covariate.labels = c("WACC", "PositiveTone", "ESG", "Total Assets", "LEV", "ROA",
+ #                              "Market/Book", "File Size", "Word Count")
+)
+```
+
+\pagebreak
+
+# Conclusion
+
+With our study, we aim to provide evidence on whether a change to a CSR reporting 
+mandate leads to a change in firms’ CSR disclosure information. With a 
+change to a mandatory CSR reporting regime enhancing transparency and 
+comparability of firms’ CSR we expect a change in firms’ CSR disclosure quantity 
+and quality which is through their CSR reporting. Adding to legitimacy theory, we 
+further expect increasing signaling strategies around a change to 
+a mandatory CSR reporting regime which leads to new CSR information, in particular
+by low CSR performing firms. We examine EU firms’ CSR reporting 
+content by different levels of CSR performance around the EU non-financial 
+reporting directive and compare these with U.S. control firms using a 
+difference-in-difference analysis.  
+
+To improve the validity of our study, we conduct several robustness tests. In 
+line with Fiechter et al. (2022), we consider an anticipation of the CSR 
+directive by EU member states and adjust the treatment event date to the 
+announcement date if the EU NFRD in an additional study. Still, we are aware of 
+several limitations of our study. First, we cannot fully exclude the possibility 
+that our results may also be influenced by omitted variables such as events that 
+are correlated with our treatment effect and changes in CSR disclosure and 
+activities. Second, as shown by Fiechter et al. (2022) firms could have 
+anticipated the change in regulation already long before the effective date. 
+Though we try to address this concern with an additional test by moving the 
+treatment effect date to the announcement date of the EU directive, there could 
+be some anticipation of this regulation and respective action even before the 
+announcement date. Finally, factors and events other than the EU NFRD could 
+incentivize firms to disclose more on sustainability topics. These incentives 
+could be created by other stakeholder groups, communities, industry specifications.  
+
+With this paper we provide some novel insights into firms’ CSR reporting behavior 
+and CSR performance around the change in the CSR reporting regulation. We 
+contribute to prior literature on CSR disclosures and enhance information 
+on firms’ CSR activities around the change to a mandatory CSR reporting regime.
+
+\pagebreak
+
+# References
+
+```{=tex}
+\singlespacing
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+```
+
+------------------------------------------------------------------------
