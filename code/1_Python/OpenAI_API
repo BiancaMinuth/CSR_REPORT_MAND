@@ -1,0 +1,169 @@
+## OPENAI API FOR SDG ANALYSIS ##
+
+import os
+from openai import OpenAI
+import time
+import logging
+from datetime import datetime
+
+client = OpenAI(api_key='XXX')
+
+##############################################################################################################################
+# Open files in openai 
+##############################################################################################################################
+
+# Directory containing your documents
+directory_path = "C:/Dokumente/1 PhD Programm/Research Projects/wp_2/data/CSR_reports/"
+
+# Initialize the list to store file IDs
+file_ids = []
+
+# Iterate over all files in the directory
+for filename in os.listdir(directory_path):
+    if filename.endswith(".txt"):  # or any file extension you're interested in
+        filepath = os.path.join(directory_path, filename)
+        
+    # Open and upload each file to OpenAI
+    with open(filepath, "rb") as file:
+        file_object = client.files.create(file=file, purpose="assistants")
+       # print(f"{file_object.id}")
+        print(f"Uploaded {filename} with ID: {file_object.id}")
+        file_ids.append(file_object.id)
+
+##############################################################################################################################
+# OPEN AI ASSISTANT     
+##############################################################################################################################
+
+# create the assistant trainer 
+
+assistant = client.beta.assistants.create(
+    name="Personal trainer",
+    instructions ="You are a highly knowledgeable AI trained on a diverse range of ESG topics, including the United Nations Sustainable Development Goals (SDGs).",
+    model="gpt-4-1106-preview",
+    tools=[{"type": "retrieval"}], 
+    file_ids=file_ids)    
+assistant_id = assistant.id
+print(assistant_id)
+
+# create the thread
+thread = client.beta.threads.create(
+    messages=[
+        {   "role": "user", 
+            "content":  
+            "Compare the reports with regard to the 17 United Nations Sustainable Development Goals. \
+             Show for each report the overlap with each of the 17 United Nations Sustainable Development Goals and \
+             explain why the respective goals apply to this text."
+            }]
+    )
+thread_id = thread.id
+print(thread_id)
+
+# created IDs
+assistant_id = 'XXX'
+thread_id = 'XXX'
+
+################################################################################################################################
+#### FIRST QUERY ###
+##############################################################################################################################
+
+# run the assistent
+run = client.beta.threads.runs.create(
+    thread_id=thread_id,
+    assistant_id=assistant_id,
+    instructions="Please anayse the reports and summarize the analysis showing the overlap between each report and the 17 SDG in a table."
+    )
+
+# information about execution
+def wait_for_run_completion(client, thread_id, run_id, sleep_interval=5):
+    """
+
+    Waits for a run to complete and prints the elapsed time.:param client: The OpenAI client object.
+    :param thread_id: The ID of the thread.
+    :param run_id: The ID of the run.
+    :param sleep_interval: Time in seconds to wait between checks.
+    """
+    while True:
+        try:
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+            if run.completed_at:
+                elapsed_time = run.completed_at - run.created_at
+                formatted_elapsed_time = time.strftime(
+                    "%H:%M:%S", time.gmtime(elapsed_time)
+                )
+                print(f"Run completed in {formatted_elapsed_time}")
+                logging.info(f"Run completed in {formatted_elapsed_time}")
+                # Get messages here once Run is completed!
+                messages = client.beta.threads.messages.list(thread_id=thread_id)
+                last_message = messages.data[0]
+                response = last_message.content[0].text.value
+                print(f"Assistant Response: {response}")
+                break
+        except Exception as e:
+            logging.error(f"An error occurred while retrieving the run: {e}")
+            break
+        logging.info("Waiting for run to complete...")
+        time.sleep(sleep_interval)
+
+# run 
+wait_for_run_completion(client=client, thread_id=thread_id, run_id=run.id)
+
+##############################################################################################################################
+#### SECOND QUERY ###
+##############################################################################################################################
+
+# run the assistent
+run = client.beta.threads.runs.create(
+    thread_id=thread_id,
+    assistant_id=assistant_id,
+    instructions="Create a table with the applicable SDGs of the respective reports."
+    )
+
+# information about execution
+def wait_for_run_completion(client, thread_id, run_id, sleep_interval=5):
+    """
+
+    Waits for a run to complete and prints the elapsed time.:param client: The OpenAI client object.
+    :param thread_id: The ID of the thread.
+    :param run_id: The ID of the run.
+    :param sleep_interval: Time in seconds to wait between checks.
+    """
+    while True:
+        try:
+            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
+            if run.completed_at:
+                elapsed_time = run.completed_at - run.created_at
+                formatted_elapsed_time = time.strftime(
+                    "%H:%M:%S", time.gmtime(elapsed_time)
+                )
+                print(f"Run completed in {formatted_elapsed_time}")
+                logging.info(f"Run completed in {formatted_elapsed_time}")
+                # Get messages here once Run is completed!
+                messages = client.beta.threads.messages.list(thread_id=thread_id)
+                last_message = messages.data[0]
+                response = last_message.content[0].text.value
+                print(f"Assistant Response: {response}")
+                break
+        except Exception as e:
+            logging.error(f"An error occurred while retrieving the run: {e}")
+            break
+        logging.info("Waiting for run to complete...")
+        time.sleep(sleep_interval)
+
+
+# run 
+wait_for_run_completion(client=client, thread_id=thread_id, run_id=run.id)
+
+import pandas as pd
+
+# Create the original DataFrame with specified columns
+df = pd.DataFrame(columns=['Report', 'Applicable SDGs'])
+
+# Data rows to be added, each as a separate DataFrame
+df1 = pd.DataFrame([{'Report': 'Report 1', 'Applicable SDGs': 'SDG 2, SDG 6'}])
+df2 = pd.DataFrame([{'Report': 'Report 2', 'Applicable SDGs': 'SDG 3, SDG 8'}])
+
+# Use pd.concat to add the new rows to the original DataFrame
+df = pd.concat([df, df1, df2], ignore_index=True)
+
+print(df)
+
